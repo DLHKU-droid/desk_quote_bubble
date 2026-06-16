@@ -9,13 +9,19 @@ import time
 import random
 import os
 import json
+import platform
 from datetime import datetime, time as dtime
 
 import akshare as ak
 
+# ── 平台检测 ──────────────────────────────────────────────
+_IS_MACOS = platform.system() == "Darwin"
+_IS_WIN   = platform.system() == "Windows"
+
 # ── 窗口尺寸 ──────────────────────────────────────────────
 W, H = 300, 74
-TRANSPARENT = "systemTransparent"
+# macOS 用系统透明色；Windows 用色键（极暗黑色作为穿透色）
+TRANSPARENT = "systemTransparent" if _IS_MACOS else "#010101"
 
 # ── 颜色 ──────────────────────────────────────────────────
 BG      = "#FFFBEC"   # 气泡背景（暖米黄）
@@ -376,8 +382,15 @@ class LCBubble:
         self.root.geometry(f"{W}x{H}+{sx}+{sy}")
         self.root.overrideredirect(True)
         self.root.wm_attributes("-topmost", True)
-        self.root.wm_attributes("-transparent", True)
-        self.root.wm_attributes("-alpha", 0.78)   # 整体透明度（1.0=不透明，0=全透明）
+        # 透明窗口：macOS 用 -transparent，Windows 用 -transparentcolor 色键
+        if _IS_MACOS:
+            self.root.wm_attributes("-transparent", True)
+            self.root.wm_attributes("-alpha", 0.78)
+        elif _IS_WIN:
+            self.root.wm_attributes("-transparentcolor", TRANSPARENT)
+            self.root.wm_attributes("-alpha", 0.92)
+        else:
+            self.root.wm_attributes("-alpha", 0.85)
         self.root.configure(bg=TRANSPARENT)
 
         self.canvas = tk.Canvas(

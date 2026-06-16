@@ -8,6 +8,21 @@
 
 ---
 
+## ⬇️ 直接下载使用
+
+> 不想自己打包？直接下载编译好的版本，双击运行，无需安装 Python。
+
+👉 **[前往 Releases 下载](https://github.com/DLHKU-droid/desk_quote_bubble/releases/latest)**
+
+| 系统 | 下载文件 | 说明 |
+|------|---------|------|
+| macOS | `桌面语录.app.zip` | 解压后双击 .app 运行 |
+| Windows | `桌面语录.exe` | 直接双击运行 |
+
+> **首次运行提示**：macOS 右键 → 打开（因无开发者签名）；Windows 点"更多信息 → 仍要运行"（SmartScreen 拦截）。这是正常现象，不是病毒。
+
+---
+
 ## 这是个什么东西？
 
 你有没有过这种痛苦：
@@ -80,20 +95,26 @@
 
 ## 安装与使用
 
-### 1. 环境要求
+### 方式一：直接下载（推荐，无需 Python）
 
-- macOS（透明窗口是 macOS 独有特性，Windows 用户请另寻他路）
+前往 **[Releases](https://github.com/DLHKU-droid/desk_quote_bubble/releases/latest)** 下载对应平台的版本，双击运行即可。
+
+### 方式二：源码运行
+
+#### 环境要求
+
+- macOS 或 Windows
 - Python 3.9+
 
-### 2. 安装依赖
+#### 安装依赖
 
 ```bash
 pip install akshare
 ```
 
-> `tkinter` 是 Python 标准库，通常已内置。若提示缺失，可通过 `brew install python-tk` 安装。
+> `tkinter` 是 Python 标准库，通常已内置。若提示缺失，macOS 可通过 `brew install python-tk` 安装。
 
-### 3. 直接运行
+#### 运行
 
 ```bash
 python3 lc_cat.py
@@ -102,10 +123,11 @@ python3 lc_cat.py
 后台静默运行（推荐，连终端窗口都不留）：
 
 ```bash
+# macOS / Linux
 python3 lc_cat.py > /tmp/lc_cat.log 2>&1 &
 ```
 
-### 4. 打包成 macOS App（强烈推荐）
+#### macOS 封装成 App（可选）
 
 编译成双击可用的 App，放进启动台，真正做到无痕启动：
 
@@ -115,14 +137,29 @@ osacompile -o ~/Desktop/桌面语录.app 桌面语录.applescript
 
 双击启动，若已在运行会弹通知提醒，不会开两个。
 
+### 方式三：自行打包可执行文件
+
+如需自己打包（开发者用）：
+
+```bash
+# macOS
+bash build.sh        # 输出 dist/桌面语录.app
+
+# Windows（在 Windows 机器上执行）
+build.bat            # 输出 dist\桌面语录.exe
+```
+
 ---
 
 ## 文件结构
 
 ```
 lc_quote_bubble/
-├── lc_cat.py               # 主程序
-├── 桌面语录.applescript    # macOS App 包装脚本
+├── lc_cat.py               # 主程序（macOS + Windows 双平台）
+├── 桌面语录.spec           # PyInstaller 打包配置
+├── build.sh                # macOS 一键构建脚本
+├── build.bat               # Windows 一键构建脚本
+├── 桌面语录.applescript    # macOS App 包装脚本（轻量启动器）
 ├── README.md               # 说明文档
 ├── requirements.txt        # 依赖列表
 └── .gitignore
