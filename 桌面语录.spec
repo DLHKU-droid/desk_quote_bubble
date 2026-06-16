@@ -1,17 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller 打包配置
+# PyInstaller 打包配置（onedir 模式，macOS .app 标准结构）
 # macOS: pyinstaller 桌面语录.spec --clean  → dist/桌面语录.app
-# Windows: pyinstaller 桌面语录.spec --clean → dist/桌面语录.exe
+# Windows: pyinstaller 桌面语录.spec --clean → dist/桌面语录/ + 桌面语录.exe
 
 import sys
+import os
 
 block_cipher = None
+
+# akshare 数据文件路径
+import akshare as _ak
+_ak_dir = os.path.dirname(_ak.__file__)
 
 a = Analysis(
     ['lc_cat.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        # akshare 运行所需的数据文件（日历等）
+        (os.path.join(_ak_dir, 'file_fold'), 'akshare/file_fold'),
+    ],
     hiddenimports=[
         'akshare',
         'pandas',
@@ -62,18 +70,15 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,   # onedir 模式：二进制单独存放
     name='桌面语录',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,       # 不弹出黑色命令行窗口
+    console=False,           # 不弹出黑色命令行窗口
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -81,10 +86,21 @@ exe = EXE(
     entitlements_file=None,
 )
 
-# macOS 专用：生成 .app bundle
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='桌面语录',
+)
+
+# macOS 专用：生成标准 .app bundle
 if sys.platform == 'darwin':
     app = BUNDLE(
-        exe,
+        coll,
         name='桌面语录.app',
         icon=None,
         bundle_identifier='com.dlhku.desk-quote-bubble',
